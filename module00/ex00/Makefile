@@ -1,10 +1,11 @@
-SRCS = $(wildcard srcs/*.cpp)
+# SRCS = $(wildcard *.cpp)
+SRCS = main.cpp
 
-NAME = module00
+NAME = a.out
 
 OBJS = $(SRCS:.cpp=.o)
 
-CC = clang++ -Wall -Wextra -Werror -std=c++98
+CC = c++ -Wall -Wextra -Werror # -std=c++98
 
 SHELL = zsh
 AQUA = \033[0;96m
