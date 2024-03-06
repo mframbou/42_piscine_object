@@ -2,72 +2,111 @@
 #include <vector>
 #include <algorithm>
 
-struct Account
-{
-    private:
-        static int idCounter;
-        const int id;
-        double value;
+// struct Account
+// {
+//     private:
+//         static int idCounter;
+//         const int id;
+//         double value;
 
-        void setValue(double value)
-        {
-            this->value = value;
-        }
+//         void setValue(double value)
+//         {
+//             this->value = value;
+//         }
 
-        void addValue(double value)
-        {
-            if (value < 0)
-                throw std::invalid_argument("Value must be positive");
-            this->value += value;
-        }
+//         void addValue(double value)
+//         {
+//             if (value < 0)
+//                 throw std::invalid_argument("Value must be positive");
+//             this->value += value;
+//         }
 
-        void removeValue(double value)
-        {
-            if (value < 0)
-                throw std::invalid_argument("Value must be positive");
-            if (this->value - value < 0)
-                throw std::invalid_argument("Not enough money in account");
-            this->value -= value;
-        }
+//         void removeValue(double value)
+//         {
+//             if (value < 0)
+//                 throw std::invalid_argument("Value must be positive");
+//             if (this->value - value < 0)
+//                 throw std::invalid_argument("Not enough money in account");
+//             this->value -= value;
+//         }
 
-        Account() :
-            id(idCounter++),
-            value(0.0)
-        {
+//         Account() :
+//             id(idCounter++),
+//             value(0.0)
+//         {
 
-        }
+//         }
 
-        Account(double initialDeposit) :
-            id(idCounter++),
-            value(initialDeposit)
-        {
+//         Account(double initialDeposit) :
+//             id(idCounter++),
+//             value(initialDeposit)
+//         {
 
-        }
+//         }
 
-        friend class Bank;
+//         friend class Bank;
 
-    public:
-        int getValue() const
-        {
-            return value;
-        }
+//     public:
+//         int getValue() const
+//         {
+//             return value;
+//         }
 
-        int getId() const
-        {
-            return id;
-        }
+//         int getId() const
+//         {
+//             return id;
+//         }
 
-        friend std::ostream& operator << (std::ostream& p_os, const Account& p_account)
-        {
-            p_os << "[" << p_account.id << "] - [" << p_account.value << "]";
-            return (p_os);
-        }
-};
-
-int Account::idCounter; // static member initialization, otherwise it will be undefined so it will not compile
+//         friend std::ostream& operator << (std::ostream& p_os, const Account& p_account)
+//         {
+//             p_os << "[" << p_account.id << "] - [" << p_account.value << "]";
+//             return (p_os);
+//         }
+// };
+// int Account::idCounter; // static member initialization, otherwise it will be undefined so it will not compile
 
 struct Bank
 {
+    struct Account {
+        private:
+            static int idCounter;
+            const int id;
+            double value;
+
+            Account() :
+                id(idCounter++),
+                value(0.0)
+            {
+
+            }
+
+            Account(double initialDeposit) :
+                id(idCounter++),
+                value(initialDeposit)
+            {
+
+            }
+
+        public:
+            double getValue() const
+            {
+                return value;
+            }
+
+            int getId() const
+            {
+                return id;
+            }
+
+            friend std::ostream& operator << (std::ostream& p_os, const Account& p_account)
+            {
+                p_os << "[" << p_account.id << "] - [" << p_account.value << "]";
+                return (p_os);
+            }
+
+            friend class Bank;
+    };
+
     private:
         double liquidity;
         std::vector<Account *> clientAccounts;
@@ -79,16 +118,16 @@ struct Bank
 
         void addLiquidity(double liquidity)
         {
-            if (liquidity < 0)
+            if (liquidity < 0.0)
                 throw std::invalid_argument("Value must be positive");
             this->liquidity += liquidity;
         }
 
         void removeLiquidity(double liquidity)
         {
-            if (liquidity < 0)
+            if (liquidity < 0.0)
                 throw std::invalid_argument("Value must be positive");
-            if (this->liquidity - liquidity < 0)
+            if (this->liquidity - liquidity < 0.0)
                 throw std::invalid_argument("Not enough liquidity in bank");
             this->liquidity -= liquidity;
         }
@@ -107,14 +146,20 @@ struct Bank
 
         void deposit(Account &account, double value)
         {
+            if (value < 0.0)
+                throw std::invalid_argument("Value must be positive");
             // bank takes 5% of all deposits
             addLiquidity(value * 0.05);
-            account.addValue(value * 0.95);
+            account.value += value * 0.95;
         }
 
         void withdraw(Account &account, double value)
         {
-            account.removeValue(value);
+            if (value < 0.0)
+                throw std::invalid_argument("Value must be positive");
+            if (account.value - value < 0.0)
+                throw std::invalid_argument("Not enough money in account");
+            account.value -= value;
         }
 
         Account &createAccount(double initialDeposit = 0.0)
@@ -126,11 +171,11 @@ struct Bank
 
         void loan(Account &account, double value)
         {
-            if (value < 0)
+            if (value < 0.0)
                 throw std::invalid_argument("Value must be positive");
             if (value > getLiquidity())
                 throw std::invalid_argument("Not enough liquidity in bank");
-            account.addValue(value);
+            account.value += value;
             removeLiquidity(value);
         }
 
@@ -139,17 +184,31 @@ struct Bank
             auto it = std::find(clientAccounts.begin(), clientAccounts.end(), &account);
             if (it != clientAccounts.end())
             {
-                clientAccounts.erase(it);
+                // replace account with NULL, so we keep the same indexes
+                *it = NULL;
                 delete &account;
             }
+        }
+
+        Account &operator[](int index)
+        {
+            if (index < 0 || index >= static_cast<int>(clientAccounts.size()))
+                throw std::out_of_range("Index " + std::to_string(index) + " out of range");
+            Account *account = clientAccounts[index];
+            if (account == NULL)
+                throw std::invalid_argument("Account " + std::to_string(index) + " does not exist anymore");
+            return *clientAccounts[index];
         }
 
         friend std::ostream& operator << (std::ostream& p_os, const Bank& p_bank)
         {
             p_os << "Bank informations : " << std::endl;
             p_os << "Liquidity : " << p_bank.liquidity << std::endl;
-            for (auto &clientAccount : p_bank.clientAccounts)
-            p_os << *clientAccount << std::endl;
+            for (auto &clientAccount : p_bank.clientAccounts) {
+                if (clientAccount == NULL)
+                    continue;
+                p_os << *clientAccount << std::endl;
+            }
             return (p_os);
         }
 
@@ -159,12 +218,13 @@ struct Bank
                 delete clientAccount;
         }
 };
+int Bank::Account::idCounter; // static member initialization, otherwise it will be undefined so it will not compile
 
 int main()
 {
     Bank bank = Bank();
-    Account &accountA = bank.createAccount(100);
-    Account &accountB = bank.createAccount(100);
+    Bank::Account &accountA = bank.createAccount(100);
+    Bank::Account &accountB = bank.createAccount(100);
 
     // accountA->addValue(100);
     // accountA->id = 5;
@@ -189,7 +249,7 @@ int main()
     bank.withdraw(accountA, 100);
     bank.deposit(accountB, 500); // 5% goes to bank so 25
 
-    Account &accountC = bank.createAccount(1000);
+    Bank::Account &accountC = bank.createAccount(1000);
 
     std::cout << " --------------------- " << std::endl;
 
@@ -212,7 +272,7 @@ int main()
     bank.removeAccount(accountC);
     bank.removeAccount(accountC); // should not crash
 
-    Account &accountD = bank.createAccount(999);
+    Bank::Account &accountD = bank.createAccount(999);
     (void) accountD;
 
     std::cout << " --------------------- " << std::endl;
@@ -231,6 +291,25 @@ int main()
 
     std::cout << "Account A id and value: " << accountA.getId() << " " << accountA.getValue() << std::endl;
     std::cout << "Bank liquidity: " << bank.getLiquidity() << std::endl;
+
+    try {
+        std::cout << bank[0] << std::endl;
+        std::cout << bank[1] << std::endl;
+        std::cout << bank[2] << std::endl;
+    } catch (std::out_of_range &e) {
+        std::cerr << "Out of range: " << e.what() << std::endl;
+    } catch (std::invalid_argument &e) {
+        std::cerr << "Invalid argument: " << e.what() << std::endl;
+    }
+
+    try {
+        std::cout << bank[3] << std::endl;
+        std::cout << bank[4] << std::endl;
+    } catch (std::out_of_range &e) {
+        std::cerr << "Out of range: " << e.what() << std::endl;
+    } catch (std::invalid_argument &e) {
+        std::cerr << "Invalid argument: " << e.what() << std::endl;
+    }
 
 	return (0);
 }
