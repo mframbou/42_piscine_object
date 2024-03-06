@@ -1,0 +1,9 @@
+*
+!*.cpp
+!*.hpp
+!Makefile
+!srcs
+!Dockerfile
+!.gitignore
+!libft/
+!module00/
