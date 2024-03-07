@@ -181,7 +181,7 @@ struct Bank
 
         void removeAccount(Account &account)
         {
-            auto it = std::find(clientAccounts.begin(), clientAccounts.end(), &account);
+            std::vector<Account *>::iterator it = std::find(clientAccounts.begin(), clientAccounts.end(), &account);
             if (it != clientAccounts.end())
             {
                 // replace account with NULL, so we keep the same indexes
@@ -193,10 +193,10 @@ struct Bank
         Account &operator[](int index)
         {
             if (index < 0 || index >= static_cast<int>(clientAccounts.size()))
-                throw std::out_of_range("Index " + std::to_string(index) + " out of range");
+                throw std::out_of_range("Index out of range");
             Account *account = clientAccounts[index];
             if (account == NULL)
-                throw std::invalid_argument("Account " + std::to_string(index) + " does not exist anymore");
+                throw std::invalid_argument("Account does not exist anymore");
             return *clientAccounts[index];
         }
 
@@ -204,18 +204,19 @@ struct Bank
         {
             p_os << "Bank informations : " << std::endl;
             p_os << "Liquidity : " << p_bank.liquidity << std::endl;
-            for (auto &clientAccount : p_bank.clientAccounts) {
-                if (clientAccount == NULL)
+            for (std::vector<Account *>::const_iterator it = p_bank.clientAccounts.begin(); it != p_bank.clientAccounts.end(); it++)
+            {
+                if (*it == NULL)
                     continue;
-                p_os << *clientAccount << std::endl;
+                p_os << **it << std::endl;
             }
             return (p_os);
         }
 
         ~Bank()
         {
-            for (auto &clientAccount : clientAccounts)
-                delete clientAccount;
+            for (std::vector<Account *>::iterator it = clientAccounts.begin(); it != clientAccounts.end(); it++)
+                delete *it;
         }
 };
 int Bank::Account::idCounter; // static member initialization, otherwise it will be undefined so it will not compile

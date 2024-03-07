@@ -5,7 +5,7 @@ NAME = a.out
 
 OBJS = $(SRCS:.cpp=.o)
 
-CC = c++ -Wall -Wextra -Werror # -std=c++98
+CC = c++ -Wall -Wextra -Werror -std=c++98
 
 SHELL = zsh
 AQUA = \033[0;96m

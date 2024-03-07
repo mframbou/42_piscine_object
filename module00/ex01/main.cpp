@@ -15,8 +15,8 @@ class Graph {
         std::vector<Vector2> points;
 
         bool hasPoint(int x, int y) {
-            for (auto &point : points) {
-                if (static_cast<int>(point.x) == x && static_cast<int>(point.y) == y) {
+            for (std::vector<Vector2>::iterator it = points.begin(); it != points.end(); it++) {
+                if (static_cast<int>(it->x) == x && static_cast<int>(it->y) == y) {
                     return true;
                 }
             }
@@ -40,11 +40,11 @@ class Graph {
             int minY = points[0].y;
             int maxX = points[0].x;
             int maxY = points[0].y;
-            for (auto &point : points) {
-                if (point.x < minX) minX = point.x;
-                if (point.y < minY) minY = point.y;
-                if (point.x > maxX) maxX = point.x;
-                if (point.y > maxY) maxY = point.y;
+            for (std::vector<Vector2>::iterator it = points.begin(); it != points.end(); it++) {
+                if (it->x < minX) minX = it->x;
+                if (it->y < minY) minY = it->y;
+                if (it->x > maxX) maxX = it->x;
+                if (it->y > maxY) maxY = it->y;
             }
 
             // add 1 to each side like in subject, and print grid         
