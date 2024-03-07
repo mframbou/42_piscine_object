@@ -1,11 +1,11 @@
 # SRCS = $(wildcard *.cpp)
-SRCS = main.cpp
+SRCS = main.cpp Workshop.cpp Worker.cpp
 
 NAME = a.out
 
 OBJS = $(SRCS:.cpp=.o)
 
-CC = c++ -Wall -Wextra -Werror # -std=c++98
+CC = c++ -Wall -Wextra -Werror -g -fsanitize=address # -std=c++98
 
 SHELL = zsh
 AQUA = \033[0;96m
@@ -24,7 +24,7 @@ YELLOW = \033[0;33m
 
 %.o: %.cpp
 	@$(CC) -c $< -o $@
-	@echo -n "$(SAME_LINE)$(AQUA)Compiling $(AQUA_BOLD)$<$(RESET)"
+	@echo -n "$(SAME_LINE)$(AQUA)Compiling $(AQUA_BOLD)$< $(RESET)"
 
 all:		$(NAME)
 

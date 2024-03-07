@@ -1,8 +1,9 @@
 #pragma once
 
-#include <iostream>
 #include <vector>
-#include "Tools.hpp"
+
+class Tool;
+class Workshop;
 
 struct Position {
     int x;
@@ -22,53 +23,26 @@ class Worker {
         Position coordonnee;
         Statistic stat;
         std::vector<Tool *> tools;
+        std::vector<Workshop *> workshops;
+
+        friend class Workshop;
 
     public:
-        Worker(): coordonnee({0, 0, 0}), stat({0, 0}) {
-            std::cout << "Worker " << this << " created" << std::endl;
-            (void) this->coordonnee;
-            (void) this->stat;
-        }
+        Worker();
+        ~Worker();
+        void giveTool(Tool *tool);
+        void removeTool(Tool *tool);
+        void printTools();
+        void work();
 
-        ~Worker() {
-            std::cout << "Worker " << this << " destroyed" << std::endl;
-        }
-
-        void giveTool(Tool *tool) {
-            std::cout << tool->getName() << " " << tool << " given to worker " << this << std::endl;
-            if (tool->owner != nullptr)
-                tool->owner->removeTool(tool);
-            this->tools.push_back(tool);
-            tool->owner = this;
-        }
-
-        void removeTool(Tool *tool) {
-            // check if the tool is in the vector
-            bool found = false;
+        template <typename T>
+        T *getTool() {
             for (std::vector<Tool *>::iterator it = this->tools.begin(); it != this->tools.end(); it++)
             {
-                if (*it == tool)
-                {
-                    found = true;
-                    std::cout << tool->getName() << " " << tool << " removed from worker " << this << std::endl;
-                    this->tools.erase(it);
-                    tool->owner = nullptr;
-                    break;
-                }
+                T *tool = dynamic_cast<T *>(*it); // dynamic_cast returns nullptr if the cast fails
+                if (tool != nullptr)
+                    return tool;
             }
-            if (!found)
-                std::cout << tool->getName() << " " << tool << " not found in worker " << this << std::endl;
-        }
-
-        void printTools() {
-            if (this->tools.size() == 0)
-            {
-                std::cout << "Worker " << this << " does not have any tools" << std::endl;
-                return;
-            }
-            
-            std::cout << "Worker " << this << " has the following tools:" << std::endl;
-            for (std::vector<Tool *>::iterator it = this->tools.begin(); it != this->tools.end(); it++)
-                std::cout << "   - " << (*it)->getName() << " " << *it << std::endl;
+            return nullptr;
         }
 };
