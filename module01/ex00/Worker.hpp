@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <iostream>
 
 class Tool;
 class Workshop;
@@ -39,10 +40,10 @@ class Worker {
         T *getTool() {
             for (std::vector<Tool *>::iterator it = this->tools.begin(); it != this->tools.end(); it++)
             {
-                T *tool = dynamic_cast<T *>(*it); // dynamic_cast returns nullptr if the cast fails
-                if (tool != nullptr)
+                T *tool = dynamic_cast<T *>(*it); // dynamic_cast returns NULL if the cast fails
+                if (tool != NULL)
                     return tool;
             }
-            return nullptr;
+            return NULL;
         }
 };

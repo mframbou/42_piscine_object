@@ -14,7 +14,7 @@ class Tool {
         Worker *owner;
 
     protected:
-        Tool(int numberOfUses): numberOfUses(numberOfUses), owner(nullptr) {}
+        Tool(int numberOfUses): numberOfUses(numberOfUses), owner(NULL) {}
 };
 
 struct Shovel: public Tool {

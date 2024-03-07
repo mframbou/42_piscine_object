@@ -24,7 +24,7 @@ class Workshop {
             }
             
             Tool *tool = worker->getTool<T>();
-            if (tool == nullptr)
+            if (tool == NULL)
             {
                 std::cout << "Worker " << worker << " does not have the required tool" << std::endl;
                 return;

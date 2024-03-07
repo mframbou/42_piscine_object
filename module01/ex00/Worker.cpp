@@ -1,7 +1,7 @@
 #include "Worker.hpp"
 #include "Workshop.hpp"
 
-Worker::Worker(): coordonnee({0, 0, 0}), stat({0, 0}) {
+Worker::Worker() {
     std::cout << "Worker " << this << " created" << std::endl;
     (void) this->coordonnee;
     (void) this->stat;
@@ -10,7 +10,7 @@ Worker::Worker(): coordonnee({0, 0, 0}), stat({0, 0}) {
 Worker::~Worker() {
     std::cout << "Worker " << this << " destroyed" << std::endl;
     for (std::vector<Tool *>::iterator it = this->tools.begin(); it != this->tools.end(); it++)
-        (*it)->owner = nullptr;
+        (*it)->owner = NULL;
     // copy workshops vector to avoid modifying it while iterating
     std::vector<Workshop *> copy = this->workshops;
     for (std::vector<Workshop *>::iterator it = copy.begin(); it != copy.end(); it++)
@@ -19,7 +19,7 @@ Worker::~Worker() {
 
 void Worker::giveTool(Tool *tool) {
     std::cout << tool->getName() << " " << tool << " given to worker " << this << std::endl;
-    if (tool->owner != nullptr)
+    if (tool->owner != NULL)
         tool->owner->removeTool(tool);
     this->tools.push_back(tool);
     tool->owner = this;
@@ -35,7 +35,7 @@ void Worker::removeTool(Tool *tool) {
             found = true;
             std::cout << tool->getName() << " " << tool << " removed from worker " << this << std::endl;
             this->tools.erase(it);
-            tool->owner = nullptr;
+            tool->owner = NULL;
             std::vector<Workshop *> copy = this->workshops;
             for (std::vector<Workshop *>::iterator it = copy.begin(); it != copy.end(); it++)
                 (*it)->unregisterWorker(this);
