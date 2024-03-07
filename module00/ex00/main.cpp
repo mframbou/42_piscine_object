@@ -104,7 +104,7 @@ struct Bank
                 return (p_os);
             }
 
-            friend class Bank;
+            friend struct Bank;
     };
 
     private:
